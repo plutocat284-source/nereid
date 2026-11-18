@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>NEREID | SATELLITE ATTITUDE</title>
+<style>
+:root{--ink:#203044;--muted:#718096;--line:#dce8e2;--green:#16845b;--green2:#0d6b49;--pale:#eaf7f0;--soft:#f5faf7;--red:#d94b58;--blue:#287fc0;--orange:#d69a2d}
+*{box-sizing:border-box}body{margin:0;background:#f3f7f5;color:var(--ink);font-family:Arial,"Pretendard","Noto Sans KR",sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+header{height:84px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.brand img{width:220px;height:76px;object-fit:contain}.header-sub{font-size:12px;color:#647b70;letter-spacing:.06em}
+main{max-width:1550px;margin:20px auto;padding:0 18px}
+.layout{display:grid;grid-template-columns:270px minmax(420px,1fr) 290px;gap:14px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}.panel-title{font-size:14px;font-weight:750;padding:15px 16px;border-bottom:1px solid var(--line)}
+.section{padding:14px 15px;border-bottom:1px solid #edf3ef}.section:last-child{border-bottom:0}.section h3{font-size:11px;color:var(--muted);letter-spacing:.04em;margin:0 0 12px}
+.field{margin-bottom:12px}.field:last-child{margin-bottom:0}.field label{display:block;font-size:11px;color:#526579;margin-bottom:6px}
+.field input[type=number]{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px 9px;font-size:12px;color:var(--ink);background:#fff}
+.field input[type=range]{width:100%;accent-color:var(--green)}.field input:focus{outline:2px solid #c5e8d5;border-color:#80c5a0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hint{font-size:10px;color:var(--muted);line-height:1.65}
+.maincol{min-width:0;display:grid;gap:12px}.canvas-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line)}
+.canvas-head strong{font-size:14px}.canvas-head span{font-size:10px;color:var(--muted)}
+#space{width:100%;height:550px;display:block;background:#fbfdfc}
+.canvas-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 13px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:9px 11px;font-size:11px;font-weight:650}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.green{background:var(--pale);border-color:#c8e7d6;color:var(--green2)}
+.spacer{flex:1}.time-readout{font-size:11px;color:var(--muted)}
+.option{font-size:10px;color:#526579;display:flex;align-items:center;gap:5px;padding:0 13px 12px}.option input{accent-color:var(--green)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.metric{background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px}.metric .label{font-size:10px;color:var(--muted);margin-bottom:6px}
+.metric .value{font-size:15px;font-weight:750;overflow-wrap:anywhere}.metric .unit{font-size:9px;color:var(--muted);font-weight:400;margin-left:3px}
+.data-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef3f0;font-size:10px}
+.data-row:last-child{border-bottom:0}.data-row span:first-child{color:var(--muted)}.data-row span:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.status{font-size:10px;color:var(--green);font-weight:700}.status.paused{color:#9a7b32}
+.legend{display:flex;gap:12px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid #edf3ef}.legend span{font-size:9px;color:#607187;display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.info-block{padding:13px 15px}.info-block h3{font-size:12px;margin:0 0 8px}
+footer{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1550px;margin:0 auto;padding:20px 22px;color:#98a4b3;font-size:10px}
+.footer-logic{font-size:10px;padding:7px 10px;color:#60776b;background:#fff;border:1px solid var(--line);border-radius:5px}
+.modal-backdrop{position:fixed;inset:0;background:#1e293b88;display:flex;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal{width:min(760px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:11px;border:1px solid var(--line)}
+.modal-head{position:sticky;top:0;background:#fff;padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:18px;font-size:12px;line-height:1.8}.modal-body h3{font-size:13px;margin:18px 0 6px;color:#18704e}.modal-body h3:first-child{margin-top:0}
+.equation{padding:9px 12px;margin:8px 0;background:#f2faf5;border:1px solid #dcefe3;border-radius:7px;color:#176747;font-family:"Cambria Math","Times New Roman",serif;font-size:14px}
+.modal-close{border:1px solid var(--line);background:#fff;border-radius:5px;padding:6px 9px}.hidden{display:none!important}
+@media(max-width:1100px){.layout{grid-template-columns:240px minmax(350px,1fr)}.right-panel{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr)}.right-panel>.panel-title{grid-column:1/-1}}
+@media(max-width:700px){header{height:68px;padding:0 12px}.brand img{width:175px;height:62px}.header-sub{font-size:9px}.layout{grid-template-columns:1fr}.right-panel{grid-column:auto;display:block}#space{height:430px}main{padding:0 9px;margin:12px auto}.metrics{grid-template-columns:repeat(2,1fr)}footer{padding:17px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><a href="index.html"><img src="Satellite.png" alt="Satellite"></a></div>
+  <div class="header-sub">SATELLITE ATTITUDE SIMULATION</div>
+</header>
+<main>
+<div class="layout">
+  <aside class="panel">
+    <div class="panel-title">인공위성 직접 설계</div>
+    <div class="section">
+      <h3>위성 기본 물리량</h3>
+      <div class="field"><label for="mass">질량 (kg)</label><input id="mass" type="number" min="1" max="5000" step="0.5" value="120"></div>
+      <div class="grid2">
+        <div class="field"><label for="sx">길이 X (m)</label><input id="sx" type="number" min=".1" max="20" step=".1" value="1.5"></div>
+        <div class="field"><label for="sy">폭 Y (m)</label><input id="sy" type="number" min=".1" max="20" step=".1" value="1.2"></div>
+        <div class="field"><label for="sz">높이 Z (m)</label><input id="sz" type="number" min=".1" max="20" step=".1" value="1"></div>
+        <div class="field"><label for="area">투영 면적 (m²)</label><input id="area" type="number" min=".01" max="500" step=".1" value="2.0"></div>
+      </div>
+      <p class="hint">질량과 크기로 직육면체 위성의 X·Y·Z축 관성모멘트를 계산합니다. 투영 면적은 외력 계산에 사용합니다.</p>
+    </div>
+    <div class="section">
+      <h3>궤도 환경</h3>
+      <div class="field"><label for="altitude">궤도 고도 (km)</label><input id="altitude" type="number" min="200" max="36000" step="50" value="550"></div>
+      <div class="field"><label for="cd">항력 계수 Cd</label><input id="cd" type="number" min="0" max="5" step=".1" value="2.2"></div>
+      <div class="field"><label for="cr">복사압 계수 Cr</label><input id="cr" type="number" min="0" max="3" step=".1" value="1.3"></div>
+    </div>
+    <div class="section">
+      <h3>초기 자세각 / 목표 자세각</h3>
+      <div class="grid2">
+        <div class="field"><label for="roll0">초기 Roll (°)</label><input id="roll0" type="number" value="15" step="1"></div>
+        <div class="field"><label for="pitch0">초기 Pitch (°)</label><input id="pitch0" type="number" value="-10" step="1"></div>
+        <div class="field"><label for="yaw0">초기 Yaw (°)</label><input id="yaw0" type="number" value="25" step="1"></div>
+        <div class="field"><label for="rollT">목표 Roll (°)</label><input id="rollT" type="number" value="0" step="1"></div>
+        <div class="field"><label for="pitchT">목표 Pitch (°)</label><input id="pitchT" type="number" value="0" step="1"></div>
+        <div class="field"><label for="yawT">목표 Yaw (°)</label><input id="yawT" type="number" value="0" step="1"></div>
+      </div>
+      <button class="btn green" id="applyDesign" style="width:100%">설계값 적용 및 초기화</button>
+    </div>
+    <div class="section">
+      <h3>자세 제어</h3>
+      <label class="option" style="padding:0 0 10px"><input id="autoControl" type="checkbox" checked> 3축 자동 자세 제어</label>
+      <div class="grid2">
+        <div class="field"><label for="manualX">수동 X 토크 (N·m)</label><input id="manualX" type="number" value="0" step=".001"></div>
+        <div class="field"><label for="manualY">수동 Y 토크 (N·m)</label><input id="manualY" type="number" value="0" step=".001"></div>
+        <div class="field"><label for="manualZ">수동 Z 토크 (N·m)</label><input id="manualZ" type="number" value="0" step=".001"></div>
+      </div>
+      <button class="btn primary" id="startBtn" style="width:100%;margin-bottom:7px">▶ 시뮬레이션 시작</button>
+      <button class="btn" id="resetBtn" style="width:100%">초기 상태로</button>
+    </div>
+  </aside>
+
+  <section class="maincol">
+    <div class="panel">
+      <div class="canvas-head">
+        <div><strong>3축 자세 및 외력 시뮬레이션</strong><div class="hint">Roll · Pitch · Yaw / 중력 · 대기 항력 · 태양 복사압</div></div>
+        <span class="status" id="runStatus">● 대기 중</span>
+      </div>
+      <canvas id="space" aria-label="3축 자세를 가진 인공위성과 작용하는 외력을 나타내는 시뮬레이션"></canvas>
+      <div class="canvas-tools">
+        <button class="btn" id="showForcesBtn">힘 벡터 표시/숨김</button>
+        <button class="btn green" id="showAxesBtn">위성 축 표시/숨김</button>
+        <span class="spacer"></span><span class="time-readout">경과 시간 <strong id="elapsed">0.0 s</strong></span>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:#d94b58"></i>중력</span>
+        <span><i class="dot" style="background:#287fc0"></i>대기 항력</span>
+        <span><i class="dot" style="background:#d69a2d"></i>태양 복사압</span>
+        <span><i class="dot" style="background:#16845b"></i>제어 토크</span>
+        <span><i class="dot" style="background:#9567c7"></i>환경 토크</span>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="label">Roll 자세각</div><div class="value" id="rollVal">15.0<span class="unit">°</span></div></div>
+      <div class="metric"><div class="label">Pitch 자세각</div><div class="value" id="pitchVal">-10.0<span class="unit">°</span></div></div>
+      <div class="metric"><div class="label">Yaw 자세각</div><div class="value" id="yawVal">25.0<span class="unit">°</span></div></div>
+      <div class="metric"><div class="label">X축 각속도</div><div class="value" id="wxVal">0.000<span class="unit">°/s</span></div></div>
+      <div class="metric"><div class="label">Y축 각속도</div><div class="value" id="wyVal">0.000<span class="unit">°/s</span></div></div>
+      <div class="metric"><div class="label">Z축 각속도</div><div class="value" id="wzVal">0.000<span class="unit">°/s</span></div></div>
+    </div>
+    <div class="panel info-block"><h3>현재 위성에 작용하는 힘과 토크</h3><div id="forceRows" class="hint"></div></div>
+  </section>
+
+  <aside class="panel right-panel">
+    <div class="panel-title">실시간 물리량</div>
+    <div class="section">
+      <h3>설계 물리량</h3>
+      <div class="data-row"><span>총 질량</span><span id="massOut">120.0 kg</span></div>
+      <div class="data-row"><span>Ixx</span><span id="ixxOut">—</span></div>
+      <div class="data-row"><span>Iyy</span><span id="iyyOut">—</span></div>
+      <div class="data-row"><span>Izz</span><span id="izzOut">—</span></div>
+      <div class="data-row"><span>투영 면적</span><span id="areaOut">2.00 m²</span></div>
+    </div>
+    <div class="section">
+      <h3>궤도 물리량</h3>
+      <div class="data-row"><span>궤도 반지름</span><span id="radiusOut">—</span></div>
+      <div class="data-row"><span>궤도 속도</span><span id="velocityOut">—</span></div>
+      <div class="data-row"><span>공전 주기</span><span id="periodOut">—</span></div>
+      <div class="data-row"><span>중력 가속도</span><span id="gravityOut">—</span></div>
+    </div>
+    <div class="section">
+      <h3>3축 토크 / 제어 상태</h3>
+      <div class="data-row"><span>환경 토크 X</span><span id="txDistOut">—</span></div>
+      <div class="data-row"><span>환경 토크 Y</span><span id="tyDistOut">—</span></div>
+      <div class="data-row"><span>환경 토크 Z</span><span id="tzDistOut">—</span></div>
+      <div class="data-row"><span>제어 토크 X/Y/Z</span><span id="controlOut">—</span></div>
+      <div class="data-row"><span>제어 모드</span><span id="modeOut">자동</span></div>
+    </div>
+    <div class="section"><h3>자세 오차</h3><div id="errorOut" class="hint">목표 자세와 현재 자세의 차이를 표시합니다.</div></div>
+  </aside>
+</div>
+</main>
+<footer><span>제작자 : 오정훈</span><button class="footer-logic" id="logicOpen">로직 보기</button></footer>
+<div class="modal-backdrop hidden" id="infoModal">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal-head"><strong id="modalTitle">3축 자세 제어 계산 로직</strong><button class="modal-close" id="modalClose">닫기 ✕</button></div>
+<div class="modal-body">
+<h3>1. 관성모멘트</h3><p>위성을 균일한 직육면체로 가정하고 사용자가 입력한 질량과 크기로 각 주축 관성모멘트를 계산합니다.</p>
+<div class="equation">Ixx = m(y² + z²)/12　 Iyy = m(x² + z²)/12　 Izz = m(x² + y²)/12</div>
+<h3>2. 궤도 운동과 외력</h3><div class="equation">v = √(μ/r)　 g = μ/r²　 T = 2π√(r³/μ)</div>
+<div class="equation">Fdrag = ½ρv²CdA　 Fsolar = PsolarCrA</div>
+<p>중력은 지구 중심 방향, 항력은 공전 속도 반대 방향, 태양 복사압은 태양에서 멀어지는 방향으로 표시합니다.</p>
+<h3>3. 3축 자세 운동</h3><div class="equation">Ixx·αx = τx　 Iyy·αy = τy　 Izz·αz = τz</div>
+<p>각 축에서 환경 토크와 제어 토크를 더해 각가속도를 계산하고, 시간에 따라 각속도와 자세각을 갱신합니다.</p>
+<h3>4. 자동 자세 제어</h3><div class="equation">τcontrol = Kp·(목표각 − 현재각) − Kd·각속도</div>
+<p>각 축에 독립적인 PD 형태의 제어기를 적용합니다. 자동 제어를 끄면 사용자가 입력한 X·Y·Z 수동 토크가 적용됩니다.</p>
+<h3>5. 교육용 모델의 한계</h3><p>실제 위성은 3차원 회전축 사이의 결합, 센서 측정 오차, 반작용 휠의 각운동량 변화, 자기토커 및 추진기 특성 등을 함께 고려합니다. 이 프로그램은 기본 원리를 살펴보기 위한 축별 단순 모델입니다.</p>
+</div></div></div>
+<script>
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id),canvas=$("space"),ctx=canvas.getContext("2d");
+const MU=3.986004418e14,RE=6371000,PS=4.56e-6;
+let running=false,last=0,elapsed=0,phase=0,att=[15,-10,25].map(v=>v*Math.PI/180),rate=[0,0,0],ctrl=[0,0,0],dist=[0,0,0],forces={},showForces=true,showAxes=true;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rad=v=>v*Math.PI/180,deg=v=>v*180/Math.PI;
+const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
+const num=id=>Number($(id).value);
+const fmt=(v,d=3)=>Number.isFinite(v)?v.toLocaleString("ko-KR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
+const sci=v=>Number.isFinite(v)?v.toExponential(3):"—";
+function design(){
+ const m=Math.max(.1,num("mass")),x=Math.max(.1,num("sx")),y=Math.max(.1,num("sy")),z=Math.max(.1,num("sz")),a=Math.max(.001,num("area"));
+ return{m,x,y,z,a,I:[m*(y*y+z*z)/12,m*(x*x+z*z)/12,m*(x*x+y*y)/12]};
+}
+function orbit(){
+ const h=Math.max(200,num("altitude"))*1000,r=RE+h,v=Math.sqrt(MU/r),g=MU/(r*r),period=2*Math.PI*Math.sqrt(r*r*r/MU);
+ return{h,r,v,g,period};
+}
+function environment(){
+ const d=design(),o=orbit();
+ // 고도별 단순 지수 대기밀도 근사(저궤도 교육용)
+ const rho=2.5e-12*Math.exp(-(o.h-400000)/60000);
+ const drag=.5*rho*o.v*o.v*Math.max(0,num("cd"))*d.a;
+ const gravity=d.m*o.g;
+ const solar=PS*Math.max(0,num("cr"))*d.a;
+ // 위성의 비대칭 질량중심/압력중심을 가정한 작은 교육용 외란 토크
+ const phaseAngle=phase;
+ const scale=1e-3;
+ const env=[scale*(Math.sin(att[1]-phaseAngle)*.55+Math.sin(att[2])*.2),
+            scale*(Math.sin(att[0]+phaseAngle)*.45-Math.sin(att[2])*.15),
+            scale*(Math.sin(att[0]-att[1])*.35+Math.sin(att[2]+phaseAngle)*.2)];
+ return{rho,drag,gravity,solar,env};
+}
+function targets(){return[rad(num("rollT")),rad(num("pitchT")),rad(num("yawT"))]}
+function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function project(p,cx,cy,s){return{x:cx+(p[0]-p[1]*.45)*s,y:cy-(p[2]+p[1]*.35)*s}}
+function rotate3(p,a){
+ let [x,y,z]=p,[rx,ry,rz]=a;
+ let cy=Math.cos(rz),sy=Math.sin(rz),cp=Math.cos(ry),sp=Math.sin(ry),cr=Math.cos(rx),sr=Math.sin(rx);
+ let x1=cy*x-sy*y,y1=sy*x+cy*y,z1=z;
+ let x2=cp*x1+sp*z1,y2=y1,z2=-sp*x1+cp*z1;
+ return[x2,cr*y2-sr*z2,sr*y2+cr*z2];
+}
+function line3(a,b,cx,cy,s,color,width=2){const p=project(a,cx,cy,s),q=project(b,cx,cy,s);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();ctx.fillStyle=color;ctx.beginPath();ctx.arc(q.x,q.y,3,0,Math.PI*2);ctx.fill()}
+function arrow(x,y,dx,dy,color,label){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();let a=Math.atan2(dy,dx);ctx.beginPath();ctx.moveTo(x+dx,y+dy);ctx.lineTo(x+dx-9*Math.cos(a-.45),y+dy-9*Math.sin(a-.45));ctx.lineTo(x+dx-9*Math.cos(a+.45),y+dy-9*Math.sin(a+.45));ctx.closePath();ctx.fill();ctx.font="11px Arial";ctx.fillText(label,x+dx+6,y+dy-5)}
+function draw(){
+ const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;
+ ctx.clearRect(0,0,w,h);ctx.fillStyle="#fbfdfc";ctx.fillRect(0,0,w,h);
+ for(let i=0;i<70;i++){ctx.fillStyle=i%4===0?"#c5d8ce":"#e1ebe5";ctx.fillRect((i*97+31)%w,(i*53+17)%h,2,2)}
+ const cx=w*.5,cy=h*.52,earthR=Math.min(w,h)*.13,orbitR=Math.min(w,h)*.37;
+ ctx.beginPath();ctx.arc(cx,cy,orbitR,0,Math.PI*2);ctx.strokeStyle="#b9d8c7";ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([]);
+ let eg=ctx.createRadialGradient(cx-earthR*.3,cy-earthR*.35,2,cx,cy,earthR);eg.addColorStop(0,"#a9d8c3");eg.addColorStop(.7,"#4d9c7a");eg.addColorStop(1,"#1e6549");ctx.fillStyle=eg;ctx.beginPath();ctx.arc(cx,cy,earthR,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#fff";ctx.font="11px Arial";ctx.textAlign="center";ctx.fillText("지구",cx,cy+4);
+ const sx=cx+orbitR*Math.cos(phase),sy=cy+orbitR*Math.sin(phase);
+ ctx.fillStyle="#d69a2d";ctx.beginPath();ctx.arc(28,32,9,0,Math.PI*2);ctx.fill();ctx.fillStyle="#9a7b32";ctx.textAlign="left";ctx.fillText("태양빛",43,36);
+ // Render a small 3D cuboid satellite using current Roll/Pitch/Yaw
+ const d=design(),s=Math.min(w,h)*.12,base=[[-.65,-.5,-.4],[.65,-.5,-.4],[.65,.5,-.4],[-.65,.5,-.4],[-.65,-.5,.4],[.65,-.5,.4],[.65,.5,.4],[-.65,.5,.4]];
+ const pts=base.map(p=>rotate3(p,att).map(v=>v*s));
+ const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+ ctx.save();ctx.lineWidth=2;ctx.strokeStyle="#456b58";ctx.fillStyle="#dce8e1";
+ const faces=[[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+ faces.forEach((f,i)=>{ctx.beginPath();f.forEach((n,j)=>{let p=project(pts[n],sx,sy,1);if(j===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)});ctx.closePath();ctx.fillStyle=["#dce8e1","#c8ddd1","#a9cdb9","#bad7c7","#91bba4","#b5d3c2"][i];ctx.fill();ctx.stroke()});
+ // Solar panel wings
+ for(const side of [-1,1]){const p1=rotate3([side*.65,0,0],att),p2=rotate3([side*1.8,0,0],att);line3(p1,p2,sx,sy,s,"#287fc0",5);const mid=project(p2,sx,sy,s);ctx.fillStyle="#b8d9e8";ctx.fillRect(mid.x-11,mid.y-5,22,10);ctx.strokeStyle="#287fc0";ctx.strokeRect(mid.x-11,mid.y-5,22,10)}
+ ctx.restore();
+ if(showAxes){
+  const axes=[{v:[1,0,0],c:"#d94b58",t:"X"},{v:[0,1,0],c:"#16845b",t:"Y"},{v:[0,0,1],c:"#287fc0",t:"Z"}];
+  axes.forEach(ax=>{let v=rotate3(ax.v,att);line3([0,0,0],v.map(q=>q*.95),sx,sy,s*1.35,ax.c,2);let p=project(v.map(q=>q*1.05),sx,sy,s*1.35);ctx.fillStyle=ax.c;ctx.font="bold 11px Arial";ctx.fillText(ax.t,p.x+5,p.y-5)});
+ }
+ if(showForces){
+  const f=forces,scaleF=Math.min(70,25+Math.log10(1+f.gravity)*7);
+  arrow(sx,sy,-Math.cos(phase)*scaleF,-Math.sin(phase)*scaleF,"#d94b58","중력");
+  arrow(sx,sy,Math.sin(phase)*34,-Math.cos(phase)*34,"#287fc0","항력");
+  arrow(sx,sy,40,0,"#d69a2d","복사압");
+ }
+ // torque status around satellite
+ ctx.fillStyle="#16845b";ctx.font="11px Arial";ctx.textAlign="left";ctx.fillText("τ제어 "+ctrl.map(v=>fmt(v,4)).join(" / "),14,h-35);
+ ctx.fillStyle="#9567c7";ctx.fillText("τ환경 "+dist.map(v=>fmt(v,4)).join(" / "),14,h-18);
+ ctx.fillStyle="#526579";ctx.textAlign="right";ctx.fillText("Roll / Pitch / Yaw",w-14,22);
+}
+function refresh(){
+ const d=design(),o=orbit(),e=environment();forces=e;dist=e.env;
+ $("massOut").textContent=fmt(d.m,2)+" kg";$("ixxOut").textContent=fmt(d.I[0],3)+" kg·m²";$("iyyOut").textContent=fmt(d.I[1],3)+" kg·m²";$("izzOut").textContent=fmt(d.I[2],3)+" kg·m²";$("areaOut").textContent=fmt(d.a,2)+" m²";
+ $("radiusOut").textContent=fmt(o.r/1000,1)+" km";$("velocityOut").textContent=fmt(o.v/1000,3)+" km/s";$("periodOut").textContent=fmt(o.period/60,2)+" min";$("gravityOut").textContent=fmt(o.g,4)+" m/s²";
+ ["rollVal","pitchVal","yawVal"].forEach((id,i)=>$(id).innerHTML=fmt(deg(att[i]),2)+'<span class="unit">°</span>');
+ ["wxVal","wyVal","wzVal"].forEach((id,i)=>$(id).innerHTML=fmt(deg(rate[i]),3)+'<span class="unit">°/s</span>');
+ $("txDistOut").textContent=sci(dist[0])+" N·m";$("tyDistOut").textContent=sci(dist[1])+" N·m";$("tzDistOut").textContent=sci(dist[2])+" N·m";
+ $("controlOut").textContent=ctrl.map(v=>fmt(v,4)).join(" / ")+" N·m";$("modeOut").textContent=$("autoControl").checked?"3축 자동":"수동";
+ const t=targets(),errs=t.map((v,i)=>deg(wrap(v-att[i])));$("errorOut").innerHTML=`Roll 오차: <b>${fmt(errs[0],2)}°</b><br>Pitch 오차: <b>${fmt(errs[1],2)}°</b><br>Yaw 오차: <b>${fmt(errs[2],2)}°</b>`;
+ $("forceRows").innerHTML=`<div class="data-row"><span>중력 (지구 중심 방향)</span><span>${sci(e.gravity)} N</span></div><div class="data-row"><span>대기 항력 (공전 반대 방향)</span><span>${sci(e.drag)} N</span></div><div class="data-row"><span>태양 복사압</span><span>${sci(e.solar)} N</span></div><div class="data-row"><span>환경 토크 X / Y / Z</span><span>${dist.map(sci).join(" / ")} N·m</span></div><div class="data-row"><span>제어 토크 X / Y / Z</span><span>${ctrl.map(sci).join(" / ")} N·m</span></div>`;
+ $("elapsed").textContent=fmt(elapsed,1)+" s";
+}
+function step(dt){
+ const d=design(),t=targets(),e=environment(),maxT=.08;
+ for(let i=0;i<3;i++){
+  const err=wrap(t[i]-att[i]);
+  let u=$("autoControl").checked ? (0.035*err-0.11*rate[i]) : num(["manualX","manualY","manualZ"][i]);
+  u=clamp(u,-maxT,maxT);ctrl[i]=u;dist[i]=e.env[i];
+  const alpha=(u+e.env[i])/d.I[i];
+  rate[i]+=alpha*dt;rate[i]=clamp(rate[i],-1.5,1.5);
+  att[i]=wrap(att[i]+rate[i]*dt);
+ }
+ phase=(phase+Math.sqrt(MU/Math.pow(orbit().r,3))*dt)%(Math.PI*2);
+ elapsed+=dt;
+}
+function animate(ts){if(!last)last=ts;const real=Math.min((ts-last)/1000,.05);last=ts;if(running){let remain=real*8;while(remain>0){const dt=Math.min(.01,remain);step(dt);remain-=dt}}refresh();draw();requestAnimationFrame(animate)}
+function reset(){running=false;last=0;elapsed=0;phase=0;att=[num("roll0"),num("pitch0"),num("yaw0")].map(rad);rate=[0,0,0];ctrl=[0,0,0];dist=[0,0,0];$("startBtn").textContent="▶ 시뮬레이션 시작";$("runStatus").textContent="● 대기 중";$("runStatus").classList.remove("paused");refresh();draw()}
+$("applyDesign").addEventListener("click",reset);$("resetBtn").addEventListener("click",reset);
+$("startBtn").addEventListener("click",()=>{running=!running;$("startBtn").textContent=running?"Ⅱ 일시 정지":"▶ 계속";$("runStatus").textContent=running?"● 실행 중":"● 일시 정지";$("runStatus").classList.toggle("paused",!running)});
+$("showForcesBtn").addEventListener("click",()=>{showForces=!showForces;draw()});$("showAxesBtn").addEventListener("click",()=>{showAxes=!showAxes;draw()});
+["mass","sx","sy","sz","area","altitude","cd","cr","roll0","pitch0","yaw0","rollT","pitchT","yawT","autoControl","manualX","manualY","manualZ"].forEach(id=>$(id).addEventListener("input",()=>{refresh();draw()}));
+$("logicOpen").addEventListener("click",()=>$("infoModal").classList.remove("hidden"));$("modalClose").addEventListener("click",()=>$("infoModal").classList.add("hidden"));
+$("infoModal").addEventListener("click",e=>{if(e.target===$("infoModal"))$("infoModal").classList.add("hidden")});window.addEventListener("keydown",e=>{if(e.key==="Escape")$("infoModal").classList.add("hidden")});
+window.addEventListener("resize",resize);reset();resize();requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
