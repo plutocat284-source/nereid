@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>네레이드 | NEREID</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, "Noto Sans KR", sans-serif;
+    background: #07111f;
+}
+
+.hero {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 50px 25px 90px;
+
+    background:
+        linear-gradient(rgba(3, 12, 25, 0.48),
+                        rgba(3, 12, 25, 0.65)),
+        url("background.png") center / cover no-repeat;
+}
+
+.content {
+    width: 100%;
+    max-width: 900px;
+    animation: appear 1s ease;
+}
+
+/* 상단 배너 */
+.banner-image {
+    display: block;
+    width: 100%;
+    max-width: 850px;
+    height: auto;
+    margin: 0 auto 35px;
+}
+
+/* 제목 */
+h1 {
+    color: white;
+    font-size: clamp(42px, 7vw, 76px);
+    font-weight: 800;
+    letter-spacing: -3px;
+    margin-bottom: 22px;
+}
+
+/* 설명 */
+.description {
+    color: #E4EDF8;
+    font-size: clamp(14px, 2vw, 18px);
+    line-height: 1.9;
+    margin-bottom: 40px;
+    font-weight: 400;
+}
+
+/* 시뮬레이터 버튼 */
+.start-btn {
+    display: inline-block;
+    padding: 17px 42px;
+    background: #0682E5;
+    border-radius: 7px;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: 0.25s;
+    box-shadow: 0 8px 25px rgba(0, 90, 190, 0.3);
+}
+
+.start-btn:hover {
+    background: #006AC5;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 90, 190, 0.45);
+}
+
+/* 하단 제작자 표시 */
+.footer {
+    position: absolute;
+    bottom: 22px;
+    left: 0;
+    width: 100%;
+    color: rgba(255,255,255,0.65);
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width:600px) {
+    .hero {
+        padding: 35px 20px 80px;
+    }
+
+    .banner-image {
+        margin-bottom: 28px;
+    }
+
+    h1 {
+        letter-spacing: -2px;
+    }
+}
+
+.simulator-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+
+.sim-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 210px;
+    padding: 15px 27px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.celestial-btn {
+    background: #287fc0;
+    color: white;
+}
+
+.celestial-btn:hover {
+    background: #17669f;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(40,127,192,0.2);
+}
+
+.satellite-btn {
+    background: #16845b;
+    color: white;
+}
+
+.satellite-btn:hover {
+    background: #0d6b49;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(22,132,91,0.2);
+}
+
+@media (max-width: 500px) {
+    .simulator-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .sim-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+
+    <div class="content">
+
+        <!-- 상단 배너 -->
+        <img
+            src="banner.png"
+            alt="네레이드"
+            class="banner-image"
+        >
+
+        <!-- 제목 -->
+        <h1>CALCULATE WHAT YOU MADE</h1>
+
+        <!-- 설명 -->
+        <p class="description">
+            나만의 우주에서 발견하는<br>
+            천체물리학의 미학
+        </p>
+
+<div class="simulator-buttons">
+    <a href="CelMech.html" class="sim-btn celestial-btn">
+        천체역학 시뮬레이터
+    </a>
+
+    <a href="Satellite.html" class="sim-btn satellite-btn">
+        인공위성 시뮬레이터
+    </a>
+</div>
+
+    </div>
+
+    <div class="footer">
+        네레이드 NEREID · 제작자 : 경북고 3학년 오정훈
+    </div>
+
+</section>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>NEREID | CELESTIAL MECHANICS</title>
+<style>
+:root{--ink:#203044;--muted:#718096;--line:#dce5ee;--blue:#1677d2;--green:#15966b}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fa;color:var(--ink);font-family:Arial,"Pretendard","Noto Sans KR",sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+header{height:84px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.brand{display:flex;align-items:center}.brand img{width:220px;height:76px;object-fit:contain}
+.header-sub{font-size:12px;color:#64748b;letter-spacing:.06em}
+main{max-width:1500px;margin:20px auto;padding:0 18px}
+.layout{display:grid;grid-template-columns:210px minmax(420px,1fr) 290px;gap:14px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.panel-title{font-size:14px;font-weight:750;padding:15px 16px;border-bottom:1px solid var(--line)}
+.section{padding:14px 15px;border-bottom:1px solid #edf1f5}.section:last-child{border-bottom:0}
+.section h3{font-size:11px;color:var(--muted);letter-spacing:.04em;margin:0 0 12px}
+.palette-item{border:1px solid var(--line);border-radius:9px;padding:13px 8px;margin-bottom:9px;text-align:center;background:#fff;cursor:pointer;user-select:none;transition:.15s}
+.palette-item:hover{border-color:#9bc7ef;background:#f8fbff}
+.palette-item.active{border:2px solid var(--blue);background:#edf6ff;padding:12px 7px}
+.preview-star{width:48px;height:48px;border-radius:50%;margin:0 auto 9px;background:radial-gradient(circle at 35% 32%,#fff0bd,#ffbd4a 52%,#d97816);box-shadow:0 0 16px #f2b54c66}
+.preview-planet{width:27px;height:27px;border-radius:50%;margin:11px auto 19px;background:radial-gradient(circle at 35% 30%,#c7eaff,#2589df 65%,#0756a0)}
+.palette-item strong{display:block;font-size:12px}.palette-item small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.hint{font-size:10px;color:var(--muted);line-height:1.65}
+.maincol{min-width:0;display:grid;gap:12px}
+.canvas-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line)}
+.canvas-head strong{font-size:14px}.canvas-head span{font-size:10px;color:var(--muted)}
+#space{width:100%;height:570px;display:block;background:#fff;touch-action:manipulation;cursor:crosshair}
+.canvas-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 13px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:9px 11px;font-size:11px;font-weight:650}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{color:#c2414b;border-color:#f0c7cb}
+.btn:disabled{opacity:.45;cursor:not-allowed}.spacer{flex:1}.time-readout{font-size:11px;color:var(--muted)}
+.options{display:flex;gap:10px;flex-wrap:wrap;padding:0 13px 12px}
+.option{font-size:10px;color:#526579;display:flex;align-items:center;gap:4px}.option input{accent-color:var(--blue)}
+.field{margin-bottom:13px}.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:11px;color:#526579;margin-bottom:6px}
+.field input{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:12px;color:var(--ink);background:#fff}
+.field input:focus{outline:2px solid #bfdef9;border-color:#78b5e9}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.apply-row{display:flex;gap:7px;margin-top:12px}.apply-row button{flex:1}
+.empty-state{font-size:11px;line-height:1.6;color:var(--muted);background:#f8fafc;border:1px dashed var(--line);border-radius:7px;padding:12px}
+.selected-name{font-weight:750;font-size:15px;margin-bottom:5px}.selected-type{font-size:10px;color:var(--muted);margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.metric{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.metric .label{font-size:10px;color:var(--muted);margin-bottom:7px}.metric .value{font-size:16px;font-weight:750;overflow-wrap:anywhere}
+.metric .unit{font-size:10px;color:var(--muted);font-weight:400;margin-left:3px}.metric .detail{font-size:9px;color:var(--muted);margin-top:5px}
+.info-block{padding:13px 15px}.info-block h3{font-size:12px;margin:0 0 10px}
+.data-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef2f6;font-size:10px}
+.data-row:last-child{border-bottom:0}.data-row span:first-child{color:var(--muted)}
+.data-row span:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.status{font-size:10px;color:var(--green);font-weight:700}
+footer{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1500px;margin:0 auto;padding:20px 22px;color:#98a4b3;font-size:10px}
+.footer-logic{font-size:10px;padding:7px 10px;color:#607187;background:#fff;border:1px solid var(--line);border-radius:5px}
+.modal-backdrop{position:fixed;inset:0;background:#1e293b88;display:flex;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal{width:min(720px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:11px;border:1px solid var(--line)}
+.modal-head{position:sticky;top:0;background:#fff;padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-head strong{font-size:14px}.modal-body{padding:18px;font-size:12px;line-height:1.8}
+.modal-body h3{font-size:13px;margin:18px 0 6px;color:#245b91}.modal-body h3:first-child{margin-top:0}
+.modal-body p{margin:5px 0}.equation{padding:9px 12px;margin:8px 0;background:#f5f9fd;border:1px solid #e2edf7;border-radius:7px;color:#155b9b;font-family:"Cambria Math","Times New Roman",serif;font-size:15px}
+.modal-close{border:1px solid var(--line);background:#fff;border-radius:5px;padding:6px 9px}.hidden{display:none!important}
+@media(max-width:1050px){.layout{grid-template-columns:175px minmax(350px,1fr)}.right-panel{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.right-panel>.panel-title{grid-column:1/-1}}
+@media(max-width:680px){header{height:68px;padding:0 12px}.brand img{width:175px;height:62px}.header-sub{font-size:9px}.layout{grid-template-columns:1fr}.left-panel{display:grid;grid-template-columns:1fr 1fr}.left-panel>.panel-title{grid-column:1/-1}.left-panel .section{border-bottom:0}.right-panel{grid-column:auto;display:block}#space{height:440px}main{padding:0 9px;margin:12px auto}footer{padding:17px 12px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">
+  <a href="index.html">
+    <img src="CelMech.png" alt="CelMech">
+  </a>
+</div>
+  <div class="header-sub">CELESTIAL MECHANICS SIMULATOR</div>
+</header>
+<main>
+<div class="layout">
+  <aside class="panel left-panel">
+    <div class="panel-title">천체 배치</div>
+    <div class="section">
+      <h3>천체 추가</h3>
+      <div class="palette-item" data-type="star"><div class="preview-star"></div><strong>항성</strong><small>선택 후 공간에 점 찍기</small></div>
+      <div class="palette-item" data-type="planet"><div class="preview-planet"></div><strong>행성</strong><small>선택 후 공간에 점 찍기</small></div>
+      <p class="hint" id="placementHint">항성 또는 행성을 선택한 뒤 흰 작업 공간의 원하는 위치를 클릭하세요. 배치된 천체를 클릭하면 선택됩니다.</p>
+    </div>
+    <div class="section">
+      <h3>시뮬레이션</h3>
+      <div class="field"><label for="timeScale">시간 배속</label><input id="timeScale" type="range" min="0.1" max="20" step="0.1" value="1"><div class="hint"><span id="timeScaleOut">1.0</span>배속</div></div>
+      <button class="btn primary" id="startBtn" style="width:100%;margin-bottom:7px">▶ 시뮬레이션 시작</button>
+      <button class="btn" id="resetBtn" style="width:100%">초기 상태로</button>
+    </div>
+  </aside>
+  <section class="maincol">
+    <div class="panel">
+      <div class="canvas-head"><div><strong>행성계 작업 공간</strong><div class="hint">격자 한 칸 = 1 AU · 천체 추가 모드를 선택한 뒤 위치를 클릭</div></div><span class="status" id="runStatus">● 대기 중</span></div>
+      <canvas id="space" aria-label="천체를 좌표에 배치하는 시뮬레이션 공간"></canvas>
+      <div class="canvas-tools">
+        <button class="btn" id="centerView">화면 중앙 정렬</button>
+        <span class="spacer"></span><span class="time-readout">경과 시간 <strong id="elapsed">0.000 년</strong></span>
+      </div>
+      <div class="options">
+        <label class="option"><input type="checkbox" id="showOrbits" checked> 계산된 공전궤도</label>
+        <label class="option"><input type="checkbox" id="showGravity"> 만유인력 확인</label>
+        <label class="option"><input type="checkbox" id="showGrid" checked> 1AU 격자</label>
+        <label class="option"><input type="checkbox" id="showLabels" checked> 천체 이름</label>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="label">선택 행성과 기준 항성 사이 거리</div><div class="value" id="distanceMetric">1.000<span class="unit">AU</span></div><div class="detail">현재 중심 거리</div></div>
+      <div class="metric"><div class="label">순간 공전 주기 근사</div><div class="value" id="periodMetric">1.000<span class="unit">년</span></div><div class="detail">타원 궤도 가정 시</div></div>
+    </div>
+    <div class="panel info-block"><h3>천체 사이 중력 상호작용</h3><div id="interactionRows" class="hint">‘만유인력 확인’을 선택하면 모든 천체 쌍 사이의 힘의 방향과 크기를 표시합니다.</div></div>
+  </section>
+  <aside class="panel right-panel">
+    <div class="panel-title">천체 물리량</div>
+    <div class="section" id="propertyPanel"><div class="empty-state">천체를 선택하면 물리량을 수정할 수 있습니다.</div></div>
+    <div class="section"><h3>현재 상태 분석</h3><div id="bodySummary" class="hint">배치된 천체의 수와 전체 질량 등이 여기에 표시됩니다.</div></div>
+  </aside>
+</div>
+</main>
+<footer><span>제작자 : 오정훈</span><button class="footer-logic" id="logicOpen">로직 보기</button></footer>
+
+<div class="modal-backdrop hidden" id="infoModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><strong id="modalTitle">시뮬레이터 계산 로직</strong><button class="modal-close" id="modalClose">닫기 ✕</button></div>
+    <div class="modal-body">
+      <h3>1. 뉴턴의 만유인력 법칙</h3>
+      <p>질량이 있는 두 천체는 서로를 끌어당깁니다. 힘의 크기는 두 질량의 곱에 비례하고, 두 천체 사이 거리의 제곱에 반비례합니다.</p>
+      <div class="equation">F = G · (m₁m₂ / r²)</div>
+      <p>여기서 G는 만유인력 상수(6.67430 × 10⁻¹¹ N·m²/kg²), m₁과 m₂는 각 천체의 질량(kg), r은 두 천체 중심 사이 거리(m)입니다. 두 천체에 작용하는 힘은 크기가 같고 방향은 서로 반대입니다.</p>
+      <h3>2. 중력의 방향과 중력 가속도</h3>
+      <div class="equation">a₁ = F₁₂ / m₁,　a₂ = F₂₁ / m₂</div>
+      <p>각 천체의 가속도 방향은 상대 천체를 향합니다. 시뮬레이터는 모든 천체 쌍(항성-항성, 항성-행성, 행성-행성)에 대해 힘을 계산하고, 각 천체의 가속도를 합산합니다.</p>
+      <h3>3. N체 운동 방정식</h3>
+      <div class="equation">d²rᵢ/dt² = Σⱼ≠ᵢ Gmⱼ (rⱼ-rᵢ) / |rⱼ-rᵢ|³</div>
+      <p>한 천체에 작용하는 전체 중력 가속도는 나머지 모든 천체가 만드는 가속도의 벡터합입니다. 따라서 행성이 여러 개이면 행성끼리의 중력도 각 행성의 운동에 영향을 줍니다.</p>
+      <h3>4. 수치 적분: 속도-위치 베르레 방법</h3>
+      <div class="equation">r(t+Δt) = r(t) + v(t)Δt + ½a(t)Δt²</div>
+      <div class="equation">v(t+Δt) = v(t) + ½[a(t)+a(t+Δt)]Δt</div>
+      <p>현재 위치와 가속도로 다음 위치를 구한 뒤, 새 위치에서 가속도를 다시 계산합니다. 이전과 다음 가속도의 평균을 사용해 속도를 갱신합니다. 이 방식은 천체 운동처럼 장시간 누적되는 역학 계산에 활용되는 적분법입니다.</p>
+      <h3>5. 초기 원궤도 속도</h3>
+      <div class="equation">v = √(G(M+m)/r)</div>
+      <p>새 행성을 배치할 때 가장 가까운 항성을 기준으로 원궤도에 가까운 초기 접선 방향 속도를 부여합니다. 여기서 M은 항성 질량, m은 행성 질량, r은 두 천체 사이 거리입니다. 다른 천체가 존재하면 실제 궤도는 원형에서 벗어날 수 있습니다.</p>
+      <h3>6. 타원궤도 설정</h3>
+      <div class="equation">rₚ = a(1-e),　vₚ = √[μ(1+e)/(a(1-e))]</div>
+      <p>a는 궤도 반장축, e는 이심률, μ=G(M+m)입니다. 입력한 반장축과 이심률을 이용해 근일점 위치와 근일점 속도를 설정합니다. e=0이면 원궤도이며, 0&lt;e&lt;1이면 타원궤도입니다.</p>
+      <h3>7. 사용 단위와 근사</h3>
+      <p>내부 운동 계산은 AU(천문단위), M☉(태양질량), 년을 사용하며 G=4π² AU³/(M☉·년²)로 둡니다. 힘을 뉴턴(N)으로 표시할 때는 SI 단위로 변환합니다. 천체의 화면상 크기는 실제 반지름 비율이 아닌 시각적 표현이며, 계산은 교육용 2차원 뉴턴 역학 모델입니다.</p>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id),canvas=$("space"),ctx=canvas.getContext("2d");
+const G=4*Math.PI*Math.PI,G_SI=6.67430e-11,AU_M=149597870700,YEAR_S=365.25*86400,MSUN_KG=1.98847e30,MEARTH_MSUN=3.0034896e-6;
+const SCALE=72;let bodies=[],selectedId=null,placementType=null,running=false,elapsed=0,lastFrame=0,nextId=1,view={x:0,y:0,zoom:1};
+const fmt=(v,d=3)=>Number.isFinite(v)?v.toLocaleString("ko-KR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
+const sci=v=>Number.isFinite(v)?v.toExponential(3):"—";
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const planetColor=i=>["#2385d8","#d95f73","#26966e","#8767cf","#cf8740","#3a9ba4"][i%6];
+function nearestStar(x,y){const ss=bodies.filter(b=>b.type==="star");return ss.length?ss.reduce((a,b)=>Math.hypot(a.x-x,a.y-y)<Math.hypot(b.x-x,b.y-y)?a:b):null}
+function nearestStarFor(b){return bodies.filter(x=>x.type==="star"&&x!==b).sort((a,c)=>Math.hypot(a.x-b.x,a.y-b.y)-Math.hypot(c.x-b.x,c.y-b.y))[0]||null}
+function makeBody(type,x,y){
+ if(type==="star"){let n=bodies.filter(b=>b.type==="star").length+1;return{id:nextId++,type,name:n===1?"항성":`항성 ${n}`,mass:1,radius:1,temp:5778,x,y,vx:0,vy:0,trail:[],color:"#e99b27"}}
+ const s=nearestStar(x,y);let dx=s?x-s.x:1,dy=s?y-s.y:0,r=Math.hypot(dx,dy);if(r<.15){r=1;x=(s?.x||0)+1;y=s?.y||0}
+ const a=Math.atan2(dy,dx),mass=MEARTH_MSUN,v=Math.sqrt(G*((s?.mass||1)+mass)/r);
+ return{id:nextId++,type,name:`행성 ${bodies.filter(b=>b.type==="planet").length+1}`,mass,radius:1,temp:288,x,y,vx:-Math.sin(a)*v,vy:Math.cos(a)*v,trail:[],color:planetColor(bodies.filter(b=>b.type==="planet").length),orbitA:r,ecc:0}
+}
+function setInitialSystem(){bodies=[];nextId=1;let s=makeBody("star",0,0);bodies.push(s);let p=makeBody("planet",1,0);bodies.push(p);p.name="지구형 행성";selectedId=p.id;elapsed=0;running=false;$("startBtn").textContent="▶ 시뮬레이션 시작";$("runStatus").textContent="● 대기 중";renderProperties();updateReadouts();draw()}
+function canvasSize(){let r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(r.width*d));canvas.height=Math.max(1,Math.round(r.height*d));ctx.setTransform(d,0,0,d,0,0)}
+function center(){return{x:canvas.clientWidth/2+view.x,y:canvas.clientHeight/2+view.y}}
+function worldToScreen(x,y){let c=center(),s=SCALE*view.zoom;return{x:c.x+x*s,y:c.y-y*s}}
+function screenToWorld(x,y){let c=center(),s=SCALE*view.zoom;return{x:(x-c.x)/s,y:-(y-c.y)/s}}
+function drawGrid(w,h){if(!$("showGrid").checked)return;let c=center(),s=SCALE*view.zoom,l=Math.floor(-c.x/s)-1,r=Math.ceil((w-c.x)/s)+1,b=Math.floor((c.y-h)/s)-1,t=Math.ceil(c.y/s)+1;ctx.lineWidth=1;
+ for(let x=l;x<=r;x++){let px=c.x+x*s;ctx.strokeStyle=x===0?"#b9c8d8":"#edf1f5";ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,h);ctx.stroke()}
+ for(let y=b;y<=t;y++){let py=c.y-y*s;ctx.strokeStyle=y===0?"#b9c8d8":"#edf1f5";ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(w,py);ctx.stroke()}
+ ctx.fillStyle="#8998a9";ctx.font="10px Arial";ctx.fillText("1 AU",c.x+s+4,c.y+13);ctx.fillText("0",c.x+5,c.y+13)}
+function orbitData(b){let s=nearestStarFor(b);if(!s)return null;let rx=b.x-s.x,ry=b.y-s.y,vx=b.vx-s.vx,vy=b.vy-s.vy,r=Math.hypot(rx,ry),mu=G*(s.mass+b.mass);if(r<1e-8)return null;let energy=(vx*vx+vy*vy)/2-mu/r;if(energy>=0)return{star:s,open:true};let a=-mu/(2*energy),h=rx*vy-ry*vx,ex=vy*h/mu-rx/r,ey=-vx*h/mu-ry/r;return{star:s,a,e:clamp(Math.hypot(ex,ey),0,.9999),peri:Math.atan2(ey,ex),open:false}}
+function drawOrbit(b){let o=orbitData(b);if(!o)return;ctx.save();ctx.beginPath();if(o.open){let p=worldToScreen(b.x,b.y);ctx.setLineDash([3,5]);ctx.strokeStyle=b.color+"88";ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+(b.vx-o.star.vx)*22,p.y-(b.vy-o.star.vy)*22);ctx.stroke();ctx.restore();return}
+ for(let t=0;t<=Math.PI*2+.025;t+=.025){let r=o.a*(1-o.e*o.e)/(1+o.e*Math.cos(t)),ang=t+o.peri,p=worldToScreen(o.star.x+r*Math.cos(ang),o.star.y+r*Math.sin(ang));if(t===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}
+ ctx.strokeStyle=b.color+"99";ctx.lineWidth=b.id===selectedId?1.8:1.2;ctx.setLineDash([5,4]);ctx.stroke();ctx.restore()}
+function pairForce(a,b){let dx=b.x-a.x,dy=b.y-a.y,rAU=Math.hypot(dx,dy),r=Math.max(rAU*AU_M,1),force=G_SI*a.mass*MSUN_KG*b.mass*MSUN_KG/(r*r);return{dx,dy,rAU,force}}
+function drawArrow(x1,y1,x2,y2,color){let dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<1)return;let ux=dx/len,uy=dy/len,head=7;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*ux-head*.55*(-uy),y2-head*uy-head*.55*ux);ctx.lineTo(x2-head*ux+head*.55*(-uy),y2-head*uy+head*.55*ux);ctx.closePath();ctx.fill()}
+function drawGravity(){if(!$("showGravity").checked||bodies.length<2)return;
+ for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){let a=bodies[i],b=bodies[j],p=worldToScreen(a.x,a.y),q=worldToScreen(b.x,b.y),dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy);if(len<1)continue;
+  let ux=dx/len,uy=dy/len,offset=10,reach=Math.min(34,Math.max(16,len*.22)),midX=(p.x+q.x)/2,midY=(p.y+q.y)/2;
+  drawArrow(p.x+ux*offset,p.y+uy*offset,p.x+ux*(offset+reach),p.y+uy*(offset+reach),"#d94b58");
+  drawArrow(q.x-ux*offset,q.y-uy*offset,q.x-ux*(offset+reach),q.y-uy*(offset+reach),"#1677d2");
+  let f=pairForce(a,b).force,label=sci(f)+" N";ctx.font="10px Arial";let tw=ctx.measureText(label).width;ctx.fillStyle="#fff";ctx.strokeStyle="#dce5ee";ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(midX-tw/2-5,midY-21,tw+10,16,4);ctx.fill();ctx.stroke();ctx.fillStyle="#30445b";ctx.textAlign="center";ctx.fillText(label,midX,midY-10);
+ }}
+function draw(){let w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);drawGrid(w,h);
+ if($("showOrbits").checked)bodies.filter(b=>b.type==="planet").forEach(drawOrbit);
+ drawGravity();
+ for(let b of bodies){let p=worldToScreen(b.x,b.y),r=b.type==="star"?10:6;
+  if(b.type==="star"){let glow=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,22);glow.addColorStop(0,"#ffd986");glow.addColorStop(.35,"#f5b74666");glow.addColorStop(1,"#f5b74600");ctx.fillStyle=glow;ctx.beginPath();ctx.arc(p.x,p.y,22,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle="#e99b27";ctx.fill();ctx.strokeStyle="#bd781b";ctx.stroke()}
+  else{let g=ctx.createRadialGradient(p.x-2,p.y-2,1,p.x,p.y,r);g.addColorStop(0,"#d7efff");g.addColorStop(.55,b.color);g.addColorStop(1,"#164d83");ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill()}
+  if(b.id===selectedId){ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,Math.PI*2);ctx.strokeStyle="#1677d2";ctx.lineWidth=1.5;ctx.stroke()}
+  if($("showLabels").checked){ctx.font="11px Arial";ctx.fillStyle="#43556a";ctx.textAlign="left";ctx.fillText(b.name,p.x+r+5,p.y-7)}
+ }
+ if(placementType){ctx.fillStyle="#1677d2";ctx.font="11px Arial";ctx.textAlign="left";ctx.fillText(placementType==="star"?"항성 배치 모드: 위치를 클릭":"행성 배치 모드: 위치를 클릭",12,20)}
+}
+function addBody(type,x,y){if(type==="planet"&&!bodies.some(b=>b.type==="star")){alert("먼저 항성을 배치해 주세요.");return}let b=makeBody(type,x,y);bodies.push(b);selectedId=b.id;placementType=null;document.querySelectorAll(".palette-item").forEach(el=>el.classList.remove("active"));$("placementHint").textContent="천체가 배치되었습니다. 다른 천체를 추가하려면 왼쪽에서 종류를 다시 선택하세요.";renderProperties();updateReadouts();draw()}
+function bodyAt(x,y){for(let i=bodies.length-1;i>=0;i--){let p=worldToScreen(bodies[i].x,bodies[i].y);if(Math.hypot(p.x-x,p.y-y)<16)return bodies[i]}return null}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderProperties(){let box=$("propertyPanel"),b=bodies.find(x=>x.id===selectedId);if(!b){box.innerHTML='<div class="empty-state">천체를 선택하면 물리량을 수정할 수 있습니다.</div>';return}let star=b.type==="star",mv=star?b.mass:b.mass/MEARTH_MSUN;
+ let orbit="";if(!star){let o=orbitData(b),near=nearestStarFor(b),r=near?Math.hypot(b.x-near.x,b.y-near.y):1,a=o&&!o.open?o.a:(b.orbitA||r),e=o&&!o.open?o.e:(b.ecc||0);
+ orbit=`<div class="field-grid"><div class="field"><label for="propAxis">궤도 반장축 (AU)</label><input id="propAxis" type="number" min=".05" max="100" step=".01" value="${a.toFixed(3)}"></div><div class="field"><label for="propEcc">이심률 (0~0.95)</label><input id="propEcc" type="number" min="0" max=".95" step=".01" value="${e.toFixed(3)}"></div></div><p class="hint">값을 적용하면 항성 기준 근일점 위치와 초기 접선 속도를 다시 설정합니다.</p>`}
+ box.innerHTML=`<div class="selected-name">${esc(b.name)}</div><div class="selected-type">${star?"항성":"행성"} · ID ${b.id}</div>
+ <div class="field"><label for="propName">천체 이름</label><input id="propName" maxlength="24" value="${esc(b.name)}"></div>
+ <div class="field"><label for="propMass">질량 (${star?"M☉":"M⊕"})</label><input id="propMass" type="number" min="${star?".01":".001"}" step="${star?".01":".1"}" value="${mv}"></div>
+ <div class="field-grid"><div class="field"><label for="propRadius">반지름 (${star?"R☉":"R⊕"})</label><input id="propRadius" type="number" min=".01" step=".1" value="${b.radius}"></div><div class="field"><label for="propTemp">온도 (K)</label><input id="propTemp" type="number" min="1" step="10" value="${b.temp}"></div></div>${orbit}
+ <div class="apply-row"><button class="btn primary" id="applyProps">물리량 적용</button><button class="btn danger" id="deleteBody">삭제</button></div>
+ <p class="hint" style="margin-top:10px">질량과 궤도 설정은 중력 및 운동 계산에 반영됩니다. 반지름과 온도는 정보 표시용입니다.</p>`;
+ $("applyProps").addEventListener("click",applyProperties);$("deleteBody").addEventListener("click",()=>deleteBody(b.id))}
+function applyProperties(){let b=bodies.find(x=>x.id===selectedId);if(!b)return;let m=Number($("propMass").value),rad=Number($("propRadius").value),temp=Number($("propTemp").value);if(!(m>0&&rad>0&&temp>0)){alert("질량, 반지름, 온도는 0보다 커야 합니다.");return}
+ b.name=$("propName").value.trim()||b.name;b.mass=b.type==="star"?m:m*MEARTH_MSUN;b.radius=rad;b.temp=temp;
+ if(b.type==="planet"){let a=Number($("propAxis").value),e=Number($("propEcc").value);if(!(a>0&&a<=100&&e>=0&&e<=.95)){alert("반장축은 0 초과 100AU 이하, 이심률은 0~0.95로 입력하세요.");return}let s=nearestStarFor(b);if(s){let ang=Math.atan2(b.y-s.y,b.x-s.x),r=a*(1-e),v=Math.sqrt(G*(s.mass+b.mass)*(1+e)/(a*(1-e)));b.x=s.x+r*Math.cos(ang);b.y=s.y+r*Math.sin(ang);b.vx=s.vx-v*Math.sin(ang);b.vy=s.vy+v*Math.cos(ang);b.orbitA=a;b.ecc=e}}
+ renderProperties();updateReadouts();draw()}
+function deleteBody(id){let b=bodies.find(x=>x.id===id);if(!b)return;if(b.type==="star"&&bodies.filter(x=>x.type==="star").length===1){alert("마지막 항성은 삭제할 수 없습니다.");return}bodies=bodies.filter(x=>x.id!==id);if(selectedId===id)selectedId=bodies[0]?.id??null;renderProperties();updateReadouts();draw()}
+function accelerations(){let ac=bodies.map(()=>({x:0,y:0}));for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){let a=bodies[i],b=bodies[j],dx=b.x-a.x,dy=b.y-a.y,r2=dx*dx+dy*dy+1e-12,k=G/(r2*Math.sqrt(r2));ac[i].x+=k*b.mass*dx;ac[i].y+=k*b.mass*dy;ac[j].x-=k*a.mass*dx;ac[j].y-=k*a.mass*dy}return ac}
+function physicsStep(dt){if(!bodies.length)return;let a0=accelerations();bodies.forEach((b,i)=>{b.x+=b.vx*dt+.5*a0[i].x*dt*dt;b.y+=b.vy*dt+.5*a0[i].y*dt*dt});let a1=accelerations();bodies.forEach((b,i)=>{b.vx+=.5*(a0[i].x+a1[i].x)*dt;b.vy+=.5*(a0[i].y+a1[i].y)*dt})}
+function updateReadouts(){ $("elapsed").textContent=fmt(elapsed,3)+" 년";$("timeScaleOut").textContent=fmt(Number($("timeScale").value),1);
+ let b=bodies.find(x=>x.id===selectedId),s=b&&b.type==="planet"?nearestStarFor(b):null;
+ if(s){let r=Math.hypot(b.x-s.x,b.y-s.y),o=orbitData(b),period=o&&!o.open?Math.sqrt(o.a**3/(s.mass+b.mass)):NaN;$("distanceMetric").innerHTML=fmt(r,3)+'<span class="unit">AU</span>';$("periodMetric").innerHTML=Number.isFinite(period)?fmt(period,3)+'<span class="unit">년</span>':"비결합"}
+ else{$("distanceMetric").textContent="—";$("periodMetric").textContent="—"}
+ if($("showGravity").checked&&bodies.length>1){let rows=[];for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){let a=bodies[i],c=bodies[j],p=pairForce(a,c),ux=p.dx/(p.rAU||1),uy=p.dy/(p.rAU||1);rows.push(`<div class="data-row"><span>${esc(a.name)} ↔ ${esc(c.name)}<br><small>방향: ${esc(a.name)} → ${esc(c.name)} / 반대 방향 동시 작용</small></span><span>${sci(p.force)} N<br><small>${fmt(p.rAU,4)} AU</small></span></div>`)}$("interactionRows").innerHTML=rows.join("")}
+ else $("interactionRows").textContent="‘만유인력 확인’을 선택하면 항성-행성 및 행성-행성을 포함한 모든 천체 쌍의 힘의 크기와 방향을 표시합니다.";
+ let mass=bodies.reduce((sum,x)=>sum+x.mass,0);$("bodySummary").innerHTML=`항성 <strong>${bodies.filter(x=>x.type==="star").length}개</strong> · 행성 <strong>${bodies.filter(x=>x.type==="planet").length}개</strong><br>전체 질량 <strong>${fmt(mass,6)} M☉</strong><br>중력 계산 대상: 모든 천체 쌍`}
+function animate(ts){if(!lastFrame)lastFrame=ts;let real=Math.min((ts-lastFrame)/1000,.04);lastFrame=ts;if(running){let total=real*.18*Number($("timeScale").value),dt=total/5;for(let i=0;i<5;i++)physicsStep(dt);elapsed+=total}updateReadouts();draw();requestAnimationFrame(animate)}
+function toggleRun(){if(!bodies.some(b=>b.type==="star")){alert("항성을 먼저 배치해 주세요.");return}running=!running;$("startBtn").textContent=running?"Ⅱ 일시 정지":"▶ 계속";$("runStatus").textContent=running?"● 실행 중":"● 일시 정지"}
+function canvasPoint(e){let r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+document.querySelectorAll(".palette-item").forEach(el=>{
+    el.addEventListener("click",()=>{
+        if(running){
+            alert("천체를 추가하려면 시뮬레이션을 일시 정지해 주세요.");
+            return;
+        }
+
+        // 이미 선택된 천체를 다시 누르면 배치 모드 해제
+        if(placementType === el.dataset.type){
+            placementType = null;
+
+            document.querySelectorAll(".palette-item")
+                .forEach(x=>x.classList.remove("active"));
+
+            $("placementHint").textContent =
+                "배치 모드가 해제되었습니다.";
+
+        } else {
+            // 다른 천체를 누르면 해당 배치 모드로 전환
+            placementType = el.dataset.type;
+
+            document.querySelectorAll(".palette-item")
+                .forEach(x=>x.classList.toggle("active",x===el));
+
+            $("placementHint").textContent =
+                (placementType==="star"?"항성":"행성")+
+                " 배치 모드입니다. 작업 공간에서 원하는 좌표를 클릭하세요.";
+        }
+
+        draw();
+    });
+});
+canvas.addEventListener("click",e=>{
+    let p=canvasPoint(e);
+    let hit=bodyAt(p.x,p.y);
+
+    // 배치 모드라면 클릭한 좌표에 천체 배치
+    if(placementType){
+        if(running){
+            alert("시뮬레이션을 일시 정지한 뒤 배치해 주세요.");
+            return;
+        }
+
+        let w=screenToWorld(p.x,p.y);
+        addBody(placementType,w.x,w.y);
+        return;
+    }
+
+    // 배치 모드가 아닐 때는 기존 천체 선택
+    if(hit){
+        selectedId=hit.id;
+        renderProperties();
+        updateReadouts();
+        draw();
+    }
+});
+$("startBtn").addEventListener("click",toggleRun);$("resetBtn").addEventListener("click",()=>{if(confirm("모든 천체를 초기 항성-지구형 행성계로 되돌릴까요?"))setInitialSystem()});
+$("centerView").addEventListener("click",()=>{view={x:0,y:0,zoom:1};draw()});$("timeScale").addEventListener("input",updateReadouts);
+["showOrbits","showGravity","showGrid","showLabels"].forEach(id=>$(id).addEventListener("change",()=>{updateReadouts();draw()}));
+$("logicOpen").addEventListener("click",()=>$("infoModal").classList.remove("hidden"));$("modalClose").addEventListener("click",()=>$("infoModal").classList.add("hidden"));
+$("infoModal").addEventListener("click",e=>{if(e.target===$("infoModal"))$("infoModal").classList.add("hidden")});
+window.addEventListener("keydown",e=>{if(e.key==="Escape")$("infoModal").classList.add("hidden")});
+window.addEventListener("resize",()=>{canvasSize();draw()});canvasSize();setInitialSystem();requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
